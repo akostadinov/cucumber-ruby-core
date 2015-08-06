@@ -9,12 +9,16 @@ module Cucumber
 
         def test_case(test_case)
           Kernel.puts(test_case.name)
-          possible_locations_index = []
-          possible_locations = []
-          locations.each_with_index do |location, index|
-            location.file == test_case.location.file &&
-              possible_locations << location &&
-              possible_locations_index << index
+          possible_locations, possible_locations_index = cached_possible_locations[test_case.location.file]
+          unless possible_locations
+            possible_locations_index = []
+            possible_locations = []
+            locations.each_with_index do |location, index|
+              location.file == test_case.location.file &&
+                possible_locations << location &&
+                possible_locations_index << index
+            end
+            cached_possible_locations[test_case.location.file] = [possible_locations, possible_locations_index ]
           end
           indexes = test_case.matching_location_indexes(possible_locations)
           indexes.each do |index|
@@ -32,6 +36,10 @@ module Cucumber
         end
 
         private
+
+        def cached_possible_locations
+          @cached_possible_locations ||= {}
+        end
 
         def sorted_test_cases
           test_cases.flatten
