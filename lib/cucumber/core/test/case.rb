@@ -17,6 +17,16 @@ module Cucumber
           test_steps.count
         end
 
+        def matching_location_index(queried_locations)
+          location = queried_locations.find_index do |location|
+            source.any? { |s| s.match_locations?([location]) }
+          end
+          return location if location
+          queried_locations.find_index do |location|
+            test_steps.any? { |node| node.match_locations? [location]}
+          end
+        end
+
         def describe_to(visitor, *args)
           visitor.test_case(self, *args) do |child_visitor|
             compose_around_hooks(child_visitor, *args) do

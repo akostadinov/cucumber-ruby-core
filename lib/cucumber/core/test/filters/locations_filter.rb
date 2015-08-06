@@ -8,7 +8,14 @@ module Cucumber
       class LocationsFilter < Filter.new(:locations)
 
         def test_case(test_case)
-          test_cases << test_case
+          Kernel.puts(test_case.name)
+          possible_locations_index = []
+          possible_locations = []
+          locations.each_with_index{ |l, i| l.file == test_case.location.file && possible_locations << l && possible_locations_index << i }
+          idx = test_case.matching_location_index(possible_locations)
+          if idx
+            test_cases[possible_locations_index[idx]] << test_case
+          end
           self
         end
 
@@ -23,17 +30,11 @@ module Cucumber
         private
 
         def sorted_test_cases
-          locations.map { |location| test_cases_matching(location) }.flatten
-        end
-
-        def test_cases_matching(location)
-          test_cases.select do |test_case|
-            test_case.match_locations?([location])
-          end
+          test_cases.flatten
         end
 
         def test_cases
-          @test_cases ||= []
+          @test_cases ||= locations.map {[]}
         end
 
       end
