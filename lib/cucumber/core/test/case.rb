@@ -23,10 +23,8 @@ module Cucumber
             source.any? { |s| s.match_locations?([location]) } &&
               matching << index
           end
-          queried_locations.each_with_index do |location, index|
-            next if matching.include? index
-            test_steps.any? { |node| node.match_locations? [location]} &&
-              matching << index
+          test_steps.each do |step|
+              matching.concat step.matching_location_indexes(queried_locations)
           end
           return matching
         end

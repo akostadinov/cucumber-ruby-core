@@ -52,6 +52,15 @@ module Cucumber
           source.any? { |s| s.match_locations?(queried_locations) }
         end
 
+        def matching_location_indexes(queried_locations)
+          matching = []
+          queried_locations.each_with_index do |location, index|
+            source.any? { |s| s.match_locations?([location]) } &&
+              matching << index
+          end
+          return matching
+        end
+
         def inspect
           "#<#{self.class}: #{location}>"
         end
