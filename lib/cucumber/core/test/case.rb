@@ -17,14 +17,18 @@ module Cucumber
           test_steps.count
         end
 
-        def matching_location_index(queried_locations)
-          location = queried_locations.find_index do |location|
-            source.any? { |s| s.match_locations?([location]) }
+        def matching_location_indexes(queried_locations)
+          matching = []
+          queried_locations.each_with_index do |location, index|
+            source.any? { |s| s.match_locations?([location]) } &&
+              matching << index
           end
-          return location if location
-          queried_locations.find_index do |location|
-            test_steps.any? { |node| node.match_locations? [location]}
+          queried_locations.each_with_index do |location, index|
+            next if matching.include? index
+            test_steps.any? { |node| node.match_locations? [location]} &&
+              matching << index
           end
+          return matching
         end
 
         def describe_to(visitor, *args)

@@ -11,10 +11,14 @@ module Cucumber
           Kernel.puts(test_case.name)
           possible_locations_index = []
           possible_locations = []
-          locations.each_with_index{ |l, i| l.file == test_case.location.file && possible_locations << l && possible_locations_index << i }
-          idx = test_case.matching_location_index(possible_locations)
-          if idx
-            test_cases[possible_locations_index[idx]] << test_case
+          locations.each_with_index do |location, index|
+            location.file == test_case.location.file &&
+              possible_locations << location &&
+              possible_locations_index << index
+          end
+          indexes = test_case.matching_location_indexes(possible_locations)
+          indexes.each do |index|
+            test_cases[possible_locations_index[index]] << test_case
           end
           self
         end
